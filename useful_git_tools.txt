@@ -1,0 +1,23 @@
+Useful Git/Tools:
+
+Open in terminal:
+- jvisualvm
+- jconsole
+
+
+Useful Git trick:
+git diff <hash> | subl
+git diff <hash> | mate
+
+git log | mate
+git log | subl
+
+Delete all branches starting with “story”
+git branch | grep "story" | xargs git branch -D
+
+Delete all branches NOT starting with “release”
+git branch | grep -v "release" | xargs git branch -D
+
+
+Delete all files starting with “Screen” in the file name, but the file name has space:
+ls | grep "Screen" | tr "\n" "\0" | xargs -0  rm
