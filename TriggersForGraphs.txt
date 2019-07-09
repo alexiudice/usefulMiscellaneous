@@ -1,10 +1,10 @@
 
 -- GRN NODES
-	CALL apoc.trigger.add("addGrnToCreatedNodes", "UNWIND {createdNodes} AS n WITH n WHERE NOT exists(n.grn) SET n.grn = 'grn:gg:' + toLower(head(labels(n))) + ':' + apoc.create.uuid()", {phase: "before"})
+	CALL apoc.trigger.add("addGrnToCreatedNodes", "UNWIND {createdNodes} AS n WITH n WHERE NOT exists(n.grn) SET n.grn = 'grn:gg:' + toLower(head(labels(n))) + ':' + apoc.text.random(44)", {phase: "before"})
 
 
 -- GRN RELATIONSHIPS
-	CALL apoc.trigger.add("addGrnToCreatedRelationships", "UNWIND {createdRelationships} AS r WITH r WHERE NOT exists(r.grn) SET r.grn = 'grn:gg:' + toLower(type(r)) + ':' + apoc.create.uuid()", {phase: "before"})
+	CALL apoc.trigger.add("addGrnToCreatedRelationships", "UNWIND {createdRelationships} AS r WITH r WHERE NOT exists(r.grn) SET r.grn = 'grn:gg:' + toLower(type(r)) + ':' + apoc.text.random(44)", {phase: "before"})
 
 
 -- FORCE INDEX PROPERTIES
