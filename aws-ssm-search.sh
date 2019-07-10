@@ -9,17 +9,52 @@
 # 
 # 
 # Usage:
-#    ssm_search "<regex>" 
+#    ssm_search_keys "<regex>" 
+#    ssm_search_values "<regex>" 
 # 
 # 
 # Ex:
-#    ssm_search "broker.*" 
+#    ssm_search_keys "broker.*" 
+#    ssm_search_keys "localhost:.*" 
 
 
-function ssm_search () {
+function ssm_search_keys () {
   aws ssm describe-parameters \
   --output text \
   | egrep '^PARAMETERS' \
   | awk '{print $4}' \
   | egrep "$1"
+}
+
+function ssm_search_values () {
+  result=$(aws ssm describe-parameters --output text | egrep '^PARAMETERS' | awk '{print $4}')
+  batch=$(echo "$result" | xargs -n 10)
+
+  while IFS=$'\n' read -r line
+  do
+    aws ssm get-parameters --output text --names $(echo "$line") | awk -v l="$1" '$4 ~ l {print $2 " ||| " $4}'
+  done <<< "$batch"
+}
+
+# Works but is slow.
+function ssm_search_values_old () {
+  result=$(aws ssm describe-parameters --output text | egrep '^PARAMETERS' | awk '{print $4}')
+  while read -r line; do
+    tmp=$(aws ssm get-parameter --output text --name $line | awk '{print $4}' | egrep "$1")
+    if [[ ! -z $(echo "$tmp") ]]
+    then
+      echo "$line ||| $tmp"
+    fi  
+  done <<< "$result"
+}
+
+# Searches a regex on both values and keys
+function ssm_search_both () {
+  result=$(aws ssm describe-parameters --output text | egrep '^PARAMETERS' | awk '{print $4}')
+  batch=$(echo "$result" | xargs -n 10)
+
+  while IFS=$'\n' read -r line
+  do
+    aws ssm get-parameters --output text --names $(echo "$line") | awk '{print $2 " ||| " $4}' | egrep "$1"
+  done <<< "$batch"
 }
