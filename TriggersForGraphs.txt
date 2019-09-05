@@ -10,11 +10,6 @@ RETURN name
 	CALL apoc.trigger.add("addGrnToCreatedRelationships", "UNWIND {createdRelationships} AS r WITH r WHERE NOT exists(r.grn) SET r.grn = 'grn:gg:' + toLower(type(r)) + ':' + apoc.text.random(44)", {phase: "before"})
 
 
--- FORCE INDEX PROPERTIES (DEPRECATED for setTimePropertiesNodes/Relationships)
-CALL apoc.trigger.add("forceIndexProperties", "UNWIND {createdNodes} AS n WITH n SET n.lastSearchIndexedAt='0' WITH n WHERE n.updatedAt IS NULL SET n.updatedAt=replace(replace(toString(apoc.date.format(timestamp(),'ms','yyyy-MM-dd HH:mm:ssZ')),' ','T'),'+0000','+00:00')", {phase: "before"})
-
-
-
 —- SET TIME PROPERTIES NODES
 WITH "UNWIND {createdNodes} AS n WITH n SET n.lastSearchIndexedAt='0' WITH n, replace(replace(toString(apoc.date.format(timestamp(),'ms','yyyy-MM-dd HH:mm:ssZ')),' ','T'),'+0000','+00:00') AS time SET n.updatedAt=coalesce(n.updatedAt, time), n.createdAt=coalesce(n.createdAt, time)" AS triggerCypher
 
