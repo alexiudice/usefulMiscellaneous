@@ -18,7 +18,7 @@ RETURN name
 
 
 —- SET TIME PROPERTIES RELATIONSHIPS
-WITH "UNWIND {createdRelationships} AS n WITH n SET n.lastSearchIndexedAt='0' WITH n, replace(replace(toString(apoc.date.format(timestamp(),'ms','yyyy-MM-dd HH:mm:ssZ')),' ','T'),'+0000','+00:00') AS time SET n.updatedAt=coalesce(n.updatedAt, time), n.createdAt=coalesce(n.createdAt, time)" AS triggerCypher
+WITH "UNWIND {createdRelationships} AS n WITH n, replace(replace(toString(apoc.date.format(timestamp(),'ms','yyyy-MM-dd HH:mm:ssZ')),' ','T'),'+0000','+00:00') AS time SET n.updatedAt=coalesce(n.updatedAt, time), n.createdAt=coalesce(n.createdAt, time)" AS triggerCypher
 
 CALL apoc.trigger.add("setTimePropertiesRelationships", triggerCypher, {phase: "before"}) YIELD name
 RETURN name
