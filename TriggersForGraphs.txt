@@ -1,24 +1,24 @@
 
 -- GRN NODES
-WITH "UNWIND {createdNodes} AS n WITH n WHERE NOT EXISTS (n.grn) CALL apoc.do.when( size(labels(n)) > 1, \"SET n.grn = 'grn:gg:' + lower(filter(l IN labels(n)WHERE l <> 'Resource')[0]) + ':' + apoc.text.random(44)\" , \"SET n.grn = 'grn:gg:' + toLower(labels(n)[0]) + ':' + apoc.text.random(44)\", {n : n } ) yield value RETURN n" AS triggerCypher
+WITH "UNWIND $createdNodes AS n WITH n WHERE NOT EXISTS (n.grn) CALL apoc.do.when( size(labels(n)) > 1, \"SET n.grn = 'grn:gg:' + lower(filter(l IN labels(n)WHERE l <> 'Resource')[0]) + ':' + apoc.text.random(44)\" , \"SET n.grn = 'grn:gg:' + toLower(labels(n)[0]) + ':' + apoc.text.random(44)\", {n : n } ) yield value RETURN n" AS triggerCypher
 
 CALL apoc.trigger.add("addGrnToCreatedNodes", triggerCypher, {phase: "before"}) YIELD name
 RETURN name
 
 
 -- GRN RELATIONSHIPS
-	CALL apoc.trigger.add("addGrnToCreatedRelationships", "UNWIND {createdRelationships} AS r WITH r WHERE NOT exists(r.grn) SET r.grn = 'grn:gg:' + toLower(type(r)) + ':' + apoc.text.random(44)", {phase: "before"})
+	CALL apoc.trigger.add("addGrnToCreatedRelationships", "UNWIND $createdRelationships AS r WITH r WHERE NOT exists(r.grn) SET r.grn = 'grn:gg:' + toLower(type(r)) + ':' + apoc.text.random(44)", {phase: "before"})
 
 
 —- SET TIME PROPERTIES NODES
-WITH "UNWIND {createdNodes} AS n WITH n SET n.lastSearchIndexedAt='0' WITH n, replace(replace(toString(apoc.date.format(timestamp(),'ms','yyyy-MM-dd HH:mm:ssZ')),' ','T'),'+0000','+00:00') AS time SET n.updatedAt=coalesce(n.updatedAt, time), n.createdAt=coalesce(n.createdAt, time)" AS triggerCypher
+WITH "UNWIND $createdNodes AS n WITH n SET n.lastSearchIndexedAt='0' WITH n, replace(replace(toString(apoc.date.format(timestamp(),'ms','yyyy-MM-dd HH:mm:ssZ')),' ','T'),'+0000','+00:00') AS time SET n.updatedAt=coalesce(n.updatedAt, time), n.createdAt=coalesce(n.createdAt, time)" AS triggerCypher
 
 CALL apoc.trigger.add("setTimePropertiesNodes", triggerCypher, {phase: "before"}) YIELD name
 RETURN name
 
 
 —- SET TIME PROPERTIES RELATIONSHIPS
-WITH "UNWIND {createdRelationships} AS n WITH n, replace(replace(toString(apoc.date.format(timestamp(),'ms','yyyy-MM-dd HH:mm:ssZ')),' ','T'),'+0000','+00:00') AS time SET n.updatedAt=coalesce(n.updatedAt, time), n.createdAt=coalesce(n.createdAt, time)" AS triggerCypher
+WITH "UNWIND $createdRelationships AS n WITH n, replace(replace(toString(apoc.date.format(timestamp(),'ms','yyyy-MM-dd HH:mm:ssZ')),' ','T'),'+0000','+00:00') AS time SET n.updatedAt=coalesce(n.updatedAt, time), n.createdAt=coalesce(n.createdAt, time)" AS triggerCypher
 
 CALL apoc.trigger.add("setTimePropertiesRelationships", triggerCypher, {phase: "before"}) YIELD name
 RETURN name
