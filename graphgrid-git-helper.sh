@@ -4,67 +4,80 @@
 # alexiudice
 #
 
+function projectsVariable () {
+  cd $GIT_HOME/
+  projects=$(ls -d "$PWD/"* | egrep "graphgrid-(boot|sdk).*")
+}
+
 function gg_full_update () {
-  for fn in $GIT_HOME/graphgrid-boot*; do
+  projectsVariable
+  for fn in $(echo "$projects"); do
     echo "$fn"
     cd "$fn"
     eval "git fetch --all"
-    eval "git checkout $1"
-    eval "git reset --hard origin/$1"
+    eval "git checkout $1 && git reset --hard origin/$1"
     printf "\n\n"
   done
+  cd $GIT_HOME/
 }
 
 function gg_full_reset () {
-  for fn in $GIT_HOME/graphgrid-boot*; do
+  projectsVariable
+  for fn in $(echo "$projects"); do
     echo "$fn"
     cd "$fn"
-    eval "git checkout $1"
-    eval "git reset --hard origin/$1"
+    eval "git checkout $1 && git reset --hard origin/$1"
     printf "\n\n"
   done
+  cd $GIT_HOME/
 }
 
 function gg_LOP () {
-  cd $GIT_HOME/
-
-  local listOfProjects=$(ls | grep "graphgrid")
-
-  echo "$listOfProjects"
+  projectsVariable
+  echo "$projects"
 }
 
 function gg_fetch_all () {
-  for fn in $GIT_HOME/graphgrid-boot*; do
+  projectsVariable
+  for fn in $(echo "$projects"); do
     echo "$fn"
     cd "$fn"
     eval "git fetch --all"
     printf "\n\n"
   done
+  cd $GIT_HOME/
 }
 
 function gg_checkout_all () {
-  for fn in $GIT_HOME/graphgrid-boot*; do
+  projectsVariable
+  for fn in $(echo "$projects"); do
     echo "$fn"
     cd "$fn"
     eval "git checkout $1"
     printf "\n\n"
   done
+  cd $GIT_HOME/
 }
 
 function gg_newBranch_all () {
-  for fn in $GIT_HOME/graphgrid-boot*; do
+  projectsVariable
+  for fn in $(echo "$projects"); do
     echo "$fn"
     cd "$fn"
     eval "git checkout -b $1"
     printf "\n\n"
   done
+  cd $GIT_HOME/
 }
 
 function gg_resetHard_all () {
-  for fn in $GIT_HOME/graphgrid-boot*; do
+  projectsVariable
+  for fn in $(echo "$projects"); do
     echo "$fn"
     cd "$fn"
     eval "git reset --hard $1"
     printf "\n\n"
   done
+  cd $GIT_HOME/
 }
+

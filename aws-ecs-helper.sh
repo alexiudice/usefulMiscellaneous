@@ -8,6 +8,10 @@
 #
 # Makes it easy to get these and ssh in without having to go use the browser.
 # 
+# NOTE: This works depending on the AWS Region the terminal CLI is signed onto with. You may need
+#	to run a CLI graphgrid login into the correct region.
+# For example, to use these scripts to acces a frazr core in us-east-1 you need to first run:
+#   graphgrid ecr login --profile graphgrid --region us-east-1 --maven
 # 
 # Usage:
 #    ec_service_ip <cluster> <service>
