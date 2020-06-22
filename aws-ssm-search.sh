@@ -22,25 +22,25 @@ function ssm_search_keys () {
   aws ssm describe-parameters \
   --output text \
   | egrep '^PARAMETERS' \
-  | awk '{print $4}' \
+  | awk '{print $5}' \
   | egrep "$1"
 }
 
 function ssm_search_values () {
-  result=$(aws ssm describe-parameters --output text | egrep '^PARAMETERS' | awk '{print $4}')
+  result=$(aws ssm describe-parameters --output text | egrep '^PARAMETERS' | awk '{print $5}')
   batch=$(echo "$result" | xargs -n 10)
 
   while IFS=$'\n' read -r line
   do
-    aws ssm get-parameters --output text --names $(echo "$line") | awk -v l="$1" '$4 ~ l {print $2 " ||| " $4}'
+    aws ssm get-parameters --output text --names $(echo "$line") | awk -v l="$1" '$5 ~ l {print $4 " ||| " $6}'
   done <<< "$batch"
 }
 
 # Works but is slow.
 function ssm_search_values_old () {
-  result=$(aws ssm describe-parameters --output text | egrep '^PARAMETERS' | awk '{print $4}')
+  result=$(aws ssm describe-parameters --output text | egrep '^PARAMETERS' | awk '{print $5}')
   while read -r line; do
-    tmp=$(aws ssm get-parameter --output text --name $line | awk '{print $4}' | egrep "$1")
+    tmp=$(aws ssm get-parameter --output text --name $line | awk '{print $5}' | egrep "$1")
     if [[ ! -z $(echo "$tmp") ]]
     then
       echo "$line ||| $tmp"
@@ -50,11 +50,11 @@ function ssm_search_values_old () {
 
 # Searches a regex on both values and keys
 function ssm_search_both () {
-  result=$(aws ssm describe-parameters --output text | egrep '^PARAMETERS' | awk '{print $4}')
+  result=$(aws ssm describe-parameters --output text | egrep '^PARAMETERS' | awk '{print $5}')
   batch=$(echo "$result" | xargs -n 10)
 
   while IFS=$'\n' read -r line
   do
-    aws ssm get-parameters --output text --names $(echo "$line") | awk '{print $2 " ||| " $4}' | egrep "$1"
+    aws ssm get-parameters --output text --names $(echo "$line") | awk '{print $4 " ||| " $6}' | egrep "$1"
   done <<< "$batch"
 }
